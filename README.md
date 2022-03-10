@@ -8,15 +8,36 @@
     - `Realm`, `SQLite`, `CoreData`
 - `RemoteDB`
     - `Firebase`, `CloudKit`
+- `SPM (Swift Package Manager)`
+- `SwiftUI`
+	- `@EnvironmentObject`, `@State`, `@Binding`
+	- `Text`, `Button`, `DatePicker`, `TextField`, `TextEditor`, `List`
+	- `HStack`, `VStack`
+	- `onTapGesture`, `onLongPressGesture`
+	- `sheet`, `popover`
+- `MVVM`
+	- `ViewModel`
+
 
 <br>
 
-### 구현 내용
-1. Realm, Firebase를 연동하여 데이터를 관리
+## 구현 내용
+- Realm, Firebase를 연동하여 데이터를 관리
+-  MVVM 패턴으로 설계 하여 구현
+-  SwiftUI를 사용하여 뷰를 구현
+- 뷰를 적절히 분리하여 빌드의 부담을 줄이고 가독성을 높힘
+- Todo/Doing/Done의 상태를 이용하여 각 해당 List에 맞게 구현하였다.
+- HStack 안에 List 세개를 나란히 위치시켜 구현
+- popover, sheet에 대해서 학습하고 사용
+- 한 번 터치, 길게 누르는 터치에 따른 액션을 정의
+-  업무의 진행상태를 enum으로 효율적으로 관리
+- 의존성 관리도구에 대해 학습하고 SPM을 사용하여 진행
 
 <br>
 
-## STEP1 프로젝트 적용기술 선정
+# STEP1 프로젝트 적용기술 선정
+
+## 고민한 점
 
 ### 1. LocalDB 비교   
 
@@ -68,3 +89,127 @@ Firebase는 다른 플랫폼과도 연동이 가능하고 비교적 저렴하며
 6. **이 앱의 요구기능에 적절한 선택인가?**
 	- 프로젝트에서 사용 필요로 하는 기능과 성능에 대해서는 충분하다고 생각된다.
 	- Deployment Target도 적절하다.
+
+
+
+# STEP 2 : 프로젝트 할일 리스트 구현
+
+
+## 고민한 점
+
+### 1. ViewModel 타입
+ViewModel에 맞는 데이터 타입을 하나 더 만들어서 사용하려고 하였으나,    
+뷰에서 사용하는 데이터와 실제 모델의 데이터가 같아 뷰모델을 위한 데이터 타입을 만들지 않고 로직 내부에서 사용하는 모델을 그대로 사용하였다.
+
+### 2. 메인화면의 상단바를 네비게이션으로 해야하는가?
+네비게이션으로 해야할지 따로 바형태로 뷰를 만들어야할지 고민했지만,   
+아이패드 전용앱으로서 Todo, Doing, Done 세가지의 리스트를 하나의 화면에서 보여주는 것이 중점이고 현재의 방향에서 네비게이션뷰가 사용될 일이 없다고 판단하였다. 이런 이유로 네비게이션으로 상단바를 따로 만들어 주었다.
+
+### 3. dismiss하는 방식
+뷰를 dismiss하는 방식을 두가지를 고민하였다.   
+첫번째는 보여주는 뷰의 상태를 수정해서 스스로 닫도록 하는 방법이다.
+보여주고 닫아야 하는 뷰에 environment property를 추가하여 presentationMode를 수정할 수 있도록 해주고 뷰를 닫아야할 때 dismiss를 호출한다.
+
+```swift
+// environment property 추가
+@Environment(\.presentationMode) var presentationMode
+
+// 뷰 dismiss
+self.presentationMode.wrappedValue.dismiss()
+```
+
+두번째 방법은 바인딩을 이용하는 것이다.   
+새로 띄운 뷰를 호출한 뷰에 바인딩을 전달하는 것으로 바인딩된 값을 띄워준 뷰에서 false로 하게 되면 뷰가 닫힌다.
+
+```swift
+// 새로운 뷰를 띄우도록 하는 뷰에서 설정
+@State private var isShowTaskDetailView = false
+
+.sheet(isPresented: $isShowTaskDetailView, onDismiss: nil) { 
+    TaskDetailView(isShowTaskDetailView: $isShowTaskDetailView, task: task)
+}
+
+// 띄울 뷰
+@Binding var isShowTaskDetailView: Bool
+
+self.isShowTaskDetailView = false
+```
+
+### 4. SwipeActions
+List의 row를 삭제하기 위해 SwipeActions를 사용하려고 하였으나 SwipeActions은 iOS15 이상부터 지원하는데 현재 프로젝트의 타겟 버전을 iOS14으로 설정하였기 때문에 사용하지 못했다.   
+그래서 아래의 버전도 사용할 수 있는 `onDelete`를 사용하였다. SwipeActions가 이미지 버튼을 만들 수 있는 등 여러 기능이 있어 사용하고 싶었지만 1-2년 이후에 사용할 수 있을 것 같다.
+
+
+## Trouble Shooting
+
+### 1. List에서 row를 공백을 터치하면 동작하지 않는 문제
+ - 문제점
+	- row를 클릭시 글자 등 컨텐츠가 없는 곳을 클릭하면 터치기능이 동작하지 않음
+ - 원인
+	- 터치 제스처를 row에 컨텐츠를 감싸고 있는 스택에 지정해두었다. 그래서 스택의 width의 길이는 각 우리가 보는 각 row의 길이가 아니라 글자가 써있는 컨텐츠의 width였다.
+
+```swift
+VStack(alignment: .leading, spacing: 4) {
+    title
+    descrition
+    deadline
+}
+.onTapGesture {
+	// ...
+}
+```
+ - 해결방안
+ 	- 스택의 width의 크기를 row의 width와 같게 해주고 contentShape을 통해서 인식할 수 있도록 하여 터치할 수 있도록 해준다.
+
+```swift
+VStack(alignment: .leading, spacing: 4) {
+    title
+    descrition
+    deadline
+}
+.frame(maxWidth: .infinity, alignment: .leading)
+.contentShape(Rectangle())
+.onTapGesture {
+	// ...
+}
+```
+
+
+### 2. List에 row가 두 개 이상일 때 터치가 먹히지 않는 문제
+- 문제점
+	- row가 두 개 이상일 때 터치를 하면 List의 처음 row의 정보만 뜨고, 길게 터치하는 것은 먹히지 않음
+- 원인
+	- 기존에는 아래와 같이 for문 안에서 TaskListCellView에 제스처를 등록해주었다. for문안에서 뷰를 그리는 중에 제스처를 등록하여 제대로 작동하지 않았다.
+
+```swift
+List {
+    ForEach(taskList) { task in
+        TaskListCellView(task: task)
+            .onTapGesture {
+				// ...
+            }
+    }
+}
+```
+- 해결방안
+	- 뷰를 분리하여 TaskListCellView안의 스택에 제스처를 등록해주었다.
+
+```swift
+var body: some View {
+    VStack(alignment: .leading, spacing: 4) {
+        title
+        descrition
+        deadline
+    }
+    .onTapGesture {
+		// ...
+    }
+}
+```
+
+
+## 1-5 PR 후 개선사항
+
+
+
+[![top](https://img.shields.io/badge/top-%23000000.svg?&amp;style=for-the-badge&amp;logo=Acclaim&amp;logoColor=white&amp;)](#프로젝트-관리-앱)
