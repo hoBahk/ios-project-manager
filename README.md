@@ -1,4 +1,5 @@
 # 📌 프로젝트 관리 앱
+
 - 프로젝트 기간: 2022.02.28 ~ 2022.03.11
 
 <br>
@@ -90,7 +91,8 @@ Firebase는 다른 플랫폼과도 연동이 가능하고 비교적 저렴하며
 	- 프로젝트에서 사용 필요로 하는 기능과 성능에 대해서는 충분하다고 생각된다.
 	- Deployment Target도 적절하다.
 
-
+<br>
+<br>
 
 # STEP 2 : 프로젝트 할일 리스트 구현
 
@@ -101,9 +103,13 @@ Firebase는 다른 플랫폼과도 연동이 가능하고 비교적 저렴하며
 ViewModel에 맞는 데이터 타입을 하나 더 만들어서 사용하려고 하였으나,    
 뷰에서 사용하는 데이터와 실제 모델의 데이터가 같아 뷰모델을 위한 데이터 타입을 만들지 않고 로직 내부에서 사용하는 모델을 그대로 사용하였다.
 
+<br>
+
 ### 2. 메인화면의 상단바를 네비게이션으로 해야하는가?
 네비게이션으로 해야할지 따로 바형태로 뷰를 만들어야할지 고민했지만,   
 아이패드 전용앱으로서 Todo, Doing, Done 세가지의 리스트를 하나의 화면에서 보여주는 것이 중점이고 현재의 방향에서 네비게이션뷰가 사용될 일이 없다고 판단하였다. 이런 이유로 네비게이션으로 상단바를 따로 만들어 주었다.
+
+<br>
 
 ### 3. dismiss하는 방식
 뷰를 dismiss하는 방식을 두가지를 고민하였다.   
@@ -135,10 +141,13 @@ self.presentationMode.wrappedValue.dismiss()
 self.isShowTaskDetailView = false
 ```
 
+<br>
+
 ### 4. SwipeActions
 List의 row를 삭제하기 위해 SwipeActions를 사용하려고 하였으나 SwipeActions은 iOS15 이상부터 지원하는데 현재 프로젝트의 타겟 버전을 iOS14으로 설정하였기 때문에 사용하지 못했다.   
 그래서 아래의 버전도 사용할 수 있는 `onDelete`를 사용하였다. SwipeActions가 이미지 버튼을 만들 수 있는 등 여러 기능이 있어 사용하고 싶었지만 1-2년 이후에 사용할 수 있을 것 같다.
 
+<br>
 
 ## Trouble Shooting
 
@@ -174,6 +183,7 @@ VStack(alignment: .leading, spacing: 4) {
 }
 ```
 
+<br>
 
 ### 2. List에 row가 두 개 이상일 때 터치가 먹히지 않는 문제
 - 문제점
@@ -212,4 +222,4 @@ var body: some View {
 
 
 
-[![top](https://img.shields.io/badge/top-%23000000.svg?&amp;style=for-the-badge&amp;logo=Acclaim&amp;logoColor=white&amp;)](#프로젝트-관리-앱)
+[![top](https://img.shields.io/badge/top-%23000000.svg?&amp;style=for-the-badge&amp;logo=Acclaim&amp;logoColor=white&amp;)](#-프로젝트-관리-앱)
