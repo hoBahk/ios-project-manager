@@ -104,24 +104,6 @@ extension TaskListViewModel {
 
 // MARK: - Firebase CRUD Method
 extension TaskListViewModel {
-    private func fetchFirebase() {
-        taskListManager.fetchFirebaseTaskList()
-            .sink { complition in
-                switch complition {
-                case .failure(let error):
-                    self.errorAlert = ErrorModel(message: error.localizedDescription)
-                    print(error.localizedDescription)
-                case .finished:
-                    return
-                }
-            } receiveValue: { taskList in
-                self.todoTaskList = taskList.filter { $0.progressStatus == .todo }
-                self.doingTaskList = taskList.filter { $0.progressStatus == .doing }
-                self.doneTaskList = taskList.filter { $0.progressStatus == .done }
-            }
-            .store(in: &cancellables)
-    }
-    
     private func createTaskOnFirebase(_ task: Task) {
         taskListManager.createFirebaseTask(task)
             .sink { completion in
@@ -203,6 +185,7 @@ extension TaskListViewModel {
         do {
             try taskListManager.createRealmTask(task)
             historyManager.appendHistory(taskHandleType: .create(title: task.title))
+            fetchRealm()
         } catch {
             errorAlert = ErrorModel(message: error.localizedDescription)
             print(error.localizedDescription)
@@ -212,6 +195,7 @@ extension TaskListViewModel {
     private func updateTaskOnRealm(id: String, title: String, description: String, deadline: Date) {
         do {
             try  taskListManager.updateRealmTask(id: id, title: title, description: description, deadline: deadline)
+            fetchRealm()
         } catch {
             errorAlert = ErrorModel(message: error.localizedDescription)
             print(error.localizedDescription)
@@ -228,6 +212,7 @@ extension TaskListViewModel {
                     nextStatus: nextStatus
                 )
             )
+            fetchRealm()
         } catch {
             errorAlert = ErrorModel(message: error.localizedDescription)
             print(error.localizedDescription)
@@ -238,6 +223,7 @@ extension TaskListViewModel {
         do {
             try  taskListManager.deleteRealmTask(id)
             historyManager.appendHistory(taskHandleType: .delete(title: title, status: taskStatus))
+            fetchRealm()
         } catch {
             errorAlert = ErrorModel(message: error.localizedDescription)
             print(error.localizedDescription)
