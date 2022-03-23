@@ -13,6 +13,7 @@ struct ProjectManagerMainView: View {
             )
             Divider()
             ProjectManagerMainContentView()
+            ProjectManagerMainFooterView()
         }
         .alert(item: $taskListViewModel.errorAlert) { error in
             Alert(title: Text("Error".localized()), message: Text(error.message.localized()))
@@ -98,6 +99,25 @@ private struct ProjectManagerMainContentView: View {
                     Divider()
                 }
             }
+        }
+    }
+}
+
+private struct ProjectManagerMainFooterView: View {
+    var body: some View {
+        HStack {
+            Spacer()
+            Button {
+                
+            } label: {
+                Image(systemName: "arrow.uturn.backward")
+            }
+            Button {
+                
+            } label: {
+                Image(systemName: "arrow.uturn.forward")
+            }
+            .padding(.horizontal)
         }
     }
 }
