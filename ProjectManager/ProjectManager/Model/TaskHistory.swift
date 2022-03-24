@@ -1,13 +1,36 @@
 import Foundation
 
 struct TaskHistory: Identifiable {
-    var description: String
-    var date: TimeInterval
+    let actionType: ActionType
+    let date: TimeInterval
     
     var id: UUID { UUID() }
     
-    init(description: String, date: TimeInterval = Date().timeIntervalSince1970) {
-        self.description = description
+    init(handleType: ActionType, date: TimeInterval = Date().timeIntervalSince1970) {
+        self.actionType = handleType
         self.date = date
+    }
+    
+    private enum Message {
+        static let create = "Added `%@`."
+        static let move = "Moved `%@` from %@ to %@."
+        static let delete = "Removed `%@` from %@."
+    }
+    
+    enum ActionType {
+        case create(title: String)
+        case move(title: String, prevStatus: TaskStatus, nextStatus: TaskStatus)
+        case delete(title: String, status: TaskStatus)
+        
+        var description: String {
+            switch self {
+            case .create(let title):
+                return Message.create.localized(with: [title])
+            case .move(let title, let prevStatus, let nextStatus):
+                return Message.move.localized(with: [title, prevStatus.name, nextStatus.name])
+            case .delete(let title, let status):
+                return Message.delete.localized(with: [title, status.name])
+            }
+        }
     }
 }
