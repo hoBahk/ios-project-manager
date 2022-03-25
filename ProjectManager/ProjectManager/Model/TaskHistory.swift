@@ -13,12 +13,14 @@ struct TaskHistory: Identifiable {
     
     private enum Message {
         static let create = "Added `%@`."
+        static let update = "Updated `%@`"
         static let move = "Moved `%@` from %@ to %@."
         static let delete = "Removed `%@` from %@."
     }
     
     enum ActionType {
         case create(title: String)
+        case update(title: String)
         case move(title: String, prevStatus: TaskStatus, nextStatus: TaskStatus)
         case delete(title: String, status: TaskStatus)
         
@@ -26,6 +28,8 @@ struct TaskHistory: Identifiable {
             switch self {
             case .create(let title):
                 return Message.create.localized(with: [title])
+            case .update(title: let title):
+                return Message.update.localized(with: [title])
             case .move(let title, let prevStatus, let nextStatus):
                 return Message.move.localized(with: [title, prevStatus.name, nextStatus.name])
             case .delete(let title, let status):

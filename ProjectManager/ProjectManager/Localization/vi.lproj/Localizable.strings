@@ -24,5 +24,6 @@
 
 // History
 "Added `%@`." = "[sự bổ sung] tiêu đề: %@";
+"Updated `%@`" = "[cập nhật] tiêu đề: %@";
 "Moved `%@` from %@ to %@." = "[sự thay đổi] tiêu đề: %@, nội dung: %@ -> %@";
 "Removed `%@` from %@." = "[sự xoá bỏ] tiêu đề: %@, trạng thái: %@";

@@ -9,6 +9,9 @@ class TaskHistoryManager {
         case .create(let title):
             let history = TaskHistory(handleType: .create(title: title))
             taskHistory.append(history)
+        case .update(let title):
+            let history = TaskHistory(handleType: .update(title: title))
+            taskHistory.append(history)
         case .move(let title, let prevStatus, let nextStatus):
             let history = TaskHistory(handleType: .move(title: title, prevStatus: prevStatus, nextStatus: nextStatus))
             taskHistory.append(history)
@@ -18,9 +21,9 @@ class TaskHistoryManager {
         }
     }
     
-    func registerUndo(undoAction: @escaping () -> Void) {
+    func registerUndo(action: @escaping () -> Void) {
         undoManager.registerUndo(withTarget: self) { _ in
-            undoAction()
+            action()
         }
     }
 }

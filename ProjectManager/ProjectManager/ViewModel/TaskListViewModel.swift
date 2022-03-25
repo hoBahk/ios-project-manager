@@ -7,7 +7,7 @@ class TaskListViewModel: ObservableObject {
     @Published var doneTaskList = [Task]()
     @Published var taskHistory = [TaskHistory]()
     @Published var errorAlert: ErrorModel?
-    var tmpTtask = Task(id: "", title: "", description: "", deadline: Date().timeIntervalSince1970, progressStatus: .todo)
+
     let taskListManager = TaskManager()
     let historyManager = TaskHistoryManager()
     let networkManager = NetworkCheckManager()
@@ -217,6 +217,7 @@ extension TaskListViewModel {
     private func updateTaskOnRealm(id: String, title: String, description: String, deadline: Date) {
         do {
             try  taskListManager.updateRealmTask(id: id, title: title, description: description, deadline: deadline)
+            historyManager.appendHistory(.update(title: title))
             fetchRealm()
         } catch {
             errorAlert = ErrorModel(message: error.localizedDescription)
