@@ -52,9 +52,7 @@ extension TaskListViewModel {
             createTaskOnFirebase(task)
         }
         createTaskOnRealm(task)
-        historyManager.registerUndo {
-            self.deleteTask(task)
-        }
+        appendHistory(.create(task))
     }
 
     func updateTask(from task: Task, to newTask: Task) {
@@ -72,29 +70,23 @@ extension TaskListViewModel {
             description: newTask.description,
             deadline: newTask.deadline.dateFormat
         )
-        historyManager.registerUndo {
-            self.updateTask(from: newTask, to: task)
-        }
+        appendHistory(.update(task, newTask: newTask))
     }
     
     func updateTaskStatus(id: String, title: String, prevStatus: TaskStatus, nextStatus: TaskStatus) {
         if networkManager.isConnected {
-            updateStatusOnFirebase(id: id, title: title, status: nextStatus)
+            updateStatusOnFirebase(id: id, status: nextStatus)
         }
-        updateStatusOnRealm(id: id, title: title, prevStatus: prevStatus, nextStatus: nextStatus)
-        historyManager.registerUndo {
-            self.updateTaskStatus(id: id, title: title, prevStatus: nextStatus, nextStatus: prevStatus)
-        }
+        updateStatusOnRealm(id: id, nextStatus: nextStatus)
+        appendHistory(.move(id: id, title: title, prevStatus: prevStatus, nextStatus: nextStatus))
     }
     
     func deleteTask(_ task: Task) {
         if networkManager.isConnected {
             deleteTaskOnFirebase(id: task.id)
         }
-        deleteTaskOnRealm(id: task.id, title: task.title, taskStatus: task.progressStatus)
-        historyManager.registerUndo {
-            self.createTask(task)
-        }
+        deleteTaskOnRealm(id: task.id, taskStatus: task.progressStatus)
+        appendHistory(.delete(task))
     }
 }
 
@@ -158,7 +150,7 @@ extension TaskListViewModel {
             .store(in: &cancellables)
     }
     
-    private func updateStatusOnFirebase(id: String, title: String, status: TaskStatus) {
+    private func updateStatusOnFirebase(id: String, status: TaskStatus) {
         taskListManager.updateFirebaseTaskStatus(id: id, taskStatus: status)
             .sink { completion in
                 switch completion {
@@ -206,7 +198,6 @@ extension TaskListViewModel {
     private func createTaskOnRealm(_ task: Task) {
         do {
             try taskListManager.createRealmTask(task)
-            historyManager.appendHistory(.create(title: task.title))
             fetchRealm()
         } catch {
             errorAlert = ErrorModel(message: error.localizedDescription)
@@ -217,7 +208,6 @@ extension TaskListViewModel {
     private func updateTaskOnRealm(id: String, title: String, description: String, deadline: Date) {
         do {
             try  taskListManager.updateRealmTask(id: id, title: title, description: description, deadline: deadline)
-            historyManager.appendHistory(.update(title: title))
             fetchRealm()
         } catch {
             errorAlert = ErrorModel(message: error.localizedDescription)
@@ -225,10 +215,9 @@ extension TaskListViewModel {
         }
     }
     
-    private func updateStatusOnRealm(id: String, title: String, prevStatus: TaskStatus, nextStatus: TaskStatus) {
+    private func updateStatusOnRealm(id: String, nextStatus: TaskStatus) {
         do {
             try taskListManager.updateRealmTaskStatus(id: id, taskStatus: nextStatus)
-            historyManager.appendHistory(.move(title: title, prevStatus: prevStatus, nextStatus: nextStatus))
             fetchRealm()
         } catch {
             errorAlert = ErrorModel(message: error.localizedDescription)
@@ -236,14 +225,41 @@ extension TaskListViewModel {
         }
     }
     
-    private func deleteTaskOnRealm(id: String, title: String, taskStatus: TaskStatus) {
+    private func deleteTaskOnRealm(id: String, taskStatus: TaskStatus) {
         do {
             try  taskListManager.deleteRealmTask(id)
-            historyManager.appendHistory(.delete(title: title, status: taskStatus))
             fetchRealm()
         } catch {
             errorAlert = ErrorModel(message: error.localizedDescription)
             print(error.localizedDescription)
+        }
+    }
+}
+
+// MARK: - History Method
+extension TaskListViewModel {
+    private func appendHistory(_ action: TaskHistory.Action) {
+        switch action {
+        case .create(let task):
+            historyManager.appendHistory(.create(task))
+            historyManager.registerUndo {
+                self.deleteTask(task)
+            }
+        case .update(let task, let newTask):
+            historyManager.appendHistory(.update(task, newTask: newTask))
+            historyManager.registerUndo {
+                self.updateTask(from: newTask, to: task)
+            }
+        case .move(let id, let title, let prevStatus, let nextStatus):
+            historyManager.appendHistory(.move(id: id, title: title, prevStatus: prevStatus, nextStatus: nextStatus))
+            historyManager.registerUndo {
+                self.updateTaskStatus(id: id, title: title, prevStatus: nextStatus, nextStatus: prevStatus)
+            }
+        case .delete(let task):
+            historyManager.appendHistory(.delete(task))
+            historyManager.registerUndo {
+                self.createTask(task)
+            }
         }
     }
 }

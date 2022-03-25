@@ -4,19 +4,19 @@ class TaskHistoryManager {
     var taskHistory = [TaskHistory]()
     var undoManager = UndoManager()
     
-    func appendHistory(_ taskActionType: TaskHistory.ActionType) {
-        switch taskActionType {
-        case .create(let title):
-            let history = TaskHistory(handleType: .create(title: title))
+    func appendHistory(_ action: TaskHistory.Action) {
+        switch action {
+        case .create(let task):
+            let history = TaskHistory(.create(task))
             taskHistory.append(history)
-        case .update(let title):
-            let history = TaskHistory(handleType: .update(title: title))
+        case .update(let task, let newTask):
+            let history = TaskHistory(.update(task, newTask: newTask))
             taskHistory.append(history)
-        case .move(let title, let prevStatus, let nextStatus):
-            let history = TaskHistory(handleType: .move(title: title, prevStatus: prevStatus, nextStatus: nextStatus))
+        case .move(let id, let title, let prevStatus, let nextStatus):
+            let history = TaskHistory(.move(id: id, title: title, prevStatus: prevStatus, nextStatus: nextStatus))
             taskHistory.append(history)
-        case .delete(let title, let status):
-            let history = TaskHistory(handleType: .delete(title: title, status: status))
+        case .delete(let task):
+            let history = TaskHistory(.delete(task))
             taskHistory.append(history)
         }
     }

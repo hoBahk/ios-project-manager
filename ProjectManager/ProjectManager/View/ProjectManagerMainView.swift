@@ -79,7 +79,7 @@ private struct TaskHistoryRowView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text(taskHistory.actionType.description)
+            Text(taskHistory.action.description)
                 .font(.title3)
                 .foregroundColor(.primary)
                 .lineLimit(2)
