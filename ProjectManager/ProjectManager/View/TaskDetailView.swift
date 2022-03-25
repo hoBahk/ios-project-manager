@@ -87,12 +87,14 @@ private struct TaskDetailTrailingButton: View {
     var body: some View {
         Button("Done".localized()) {
             if taskDetailViewModel.isEditing {
-                taskListViewModel.updateTask(
+                let newTask = Task(
                     id: task.id,
                     title: taskDetailViewModel.title,
                     description: taskDetailViewModel.description,
-                    deadline: taskDetailViewModel.deadline
+                    deadline: taskDetailViewModel.deadline.timeIntervalSince1970,
+                    progressStatus: task.progressStatus
                 )
+                taskListViewModel.updateTask(from: task, to: newTask)
             } else {
                 let task = Task(
                     title: taskDetailViewModel.title,
@@ -128,6 +130,7 @@ private struct TaskDetailTitleTextField: View {
         TextField("Title", text: $taskDetailViewModel.title)
             .multilineTextAlignment(.leading)
             .textFieldStyle(RoundedBorderTextFieldStyle())
+            .shadow(color: .primary, radius: 1)
             .foregroundColor(.primary)
             .disabled(taskDetailViewModel.isDisabled)
     }
@@ -151,5 +154,6 @@ private struct TaskDetailDescriptionTextEditor: View {
             .multilineTextAlignment(.leading)
             .shadow(color: .primary, radius: 1)
             .disabled(taskDetailViewModel.isDisabled)
+            .padding(.bottom)
     }
 }

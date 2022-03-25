@@ -53,7 +53,7 @@ private struct TaskListContentView: View {
             }
             .onDelete { indexSet in
                 let task = taskList[indexSet.index]
-                taskListViewModel.deleteTask(id: task.id, title: task.title, taskStatus: task.progressStatus)
+                taskListViewModel.deleteTask(task)
             }
             .alert(item: $taskListViewModel.errorAlert) { error in
                 Alert(title: Text("Error".localized()), message: Text(error.message))

@@ -17,4 +17,10 @@ class TaskHistoryManager {
             taskHistory.append(history)
         }
     }
+    
+    func registerUndo(undoAction: @escaping () -> Void) {
+        undoManager.registerUndo(withTarget: self) { _ in
+            undoAction()
+        }
+    }
 }

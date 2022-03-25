@@ -1,6 +1,10 @@
 import Foundation
 
 extension TimeInterval {
+    var dateFormat: Date {
+        return Date(timeIntervalSince1970: self)
+    }
+    
     func formatString(dateStyle: DateFormatter.Style = .none, timeStyle: DateFormatter.Style = .none) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = dateStyle
