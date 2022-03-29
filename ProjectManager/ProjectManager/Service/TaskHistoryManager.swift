@@ -2,35 +2,28 @@ import Foundation
 
 class TaskHistoryManager {
     var taskHistory = [TaskHistory]()
+    var undoManager = UndoManager()
     
-    private enum Message {
-        static let add = "Added `%@`."
-        static let move = "Moved `%@` from %@ to %@."
-        static let delete = "Removed `%@` from %@."
+    func appendHistory(_ action: TaskHistory.Action) {
+        switch action {
+        case .create(let task):
+            let history = TaskHistory(.create(task))
+            taskHistory.append(history)
+        case .update(let task, let newTask):
+            let history = TaskHistory(.update(task, newTask: newTask))
+            taskHistory.append(history)
+        case .move(let id, let title, let prevStatus, let nextStatus):
+            let history = TaskHistory(.move(id: id, title: title, prevStatus: prevStatus, nextStatus: nextStatus))
+            taskHistory.append(history)
+        case .delete(let task):
+            let history = TaskHistory(.delete(task))
+            taskHistory.append(history)
+        }
     }
     
-    enum TaskHandleType {
-        case create(title: String)
-        case move(title: String, prevStatus: TaskStatus, nextStatus: TaskStatus)
-        case delete(title: String, status: TaskStatus)
-    }
-    
-    func appendHistory(taskHandleType: TaskHandleType) {
-        let date = Date().timeIntervalSince1970
-        
-        switch taskHandleType {
-        case .create(let title):
-            let description = Message.add.localized(with: [title])
-            let history = TaskHistory(description: description, date: date)
-            taskHistory.append(history)
-        case .move(let title, let prevStatus, let nextStatus):
-            let description = Message.move.localized(with: [title, prevStatus.name, nextStatus.name])
-            let history = TaskHistory(description: description, date: date)
-            taskHistory.append(history)
-        case .delete(let title, let status):
-            let description = Message.delete.localized(with: [title, status.name])
-            let history = TaskHistory(description: description, date: date)
-            taskHistory.append(history)
+    func registerUndo(action: @escaping () -> Void) {
+        undoManager.registerUndo(withTarget: self) { _ in
+            action()
         }
     }
 }

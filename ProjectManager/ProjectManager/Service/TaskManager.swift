@@ -146,7 +146,6 @@ extension TaskManager: RealmTaskManagable {
         do {
             let realmTask = convertRealmEntityTask(from: task)
             try realmTaskListRepository.createTask(task: realmTask)
-            try fetchRealmTaskList()
         } catch {
             throw RealmError.createFailed
         }
@@ -155,7 +154,6 @@ extension TaskManager: RealmTaskManagable {
     func updateRealmTask(id: String, title: String, description: String, deadline: Date) throws {
         do {
             try realmTaskListRepository.updateTask(id: id, title: title, description: description, deadline: deadline)
-            try fetchRealmTaskList()
         } catch {
             throw RealmError.updateFailed
         }
@@ -167,7 +165,6 @@ extension TaskManager: RealmTaskManagable {
                 id: id,
                 taskStatus: TaskStatus(rawValue: taskStatus.rawValue) ?? .todo
             )
-            try fetchRealmTaskList()
         } catch {
             throw RealmError.updateFailed
         }
@@ -176,7 +173,6 @@ extension TaskManager: RealmTaskManagable {
     func deleteRealmTask(_ id: String) throws {
         do {
             try realmTaskListRepository.deleteTask(id: id)
-            try fetchRealmTaskList()
         } catch {
             throw RealmError.deleteFailed
         }

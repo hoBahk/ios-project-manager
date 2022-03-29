@@ -13,6 +13,7 @@ struct ProjectManagerMainView: View {
             )
             Divider()
             ProjectManagerMainContentView()
+            ProjectManagerMainFooterView()
         }
         .alert(item: $taskListViewModel.errorAlert) { error in
             Alert(title: Text("Error".localized()), message: Text(error.message.localized()))
@@ -78,7 +79,7 @@ private struct TaskHistoryRowView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text(taskHistory.description)
+            Text(taskHistory.action.description)
                 .font(.title3)
                 .foregroundColor(.primary)
                 .lineLimit(2)
@@ -98,6 +99,29 @@ private struct ProjectManagerMainContentView: View {
                     Divider()
                 }
             }
+        }
+    }
+}
+
+private struct ProjectManagerMainFooterView: View {
+    @EnvironmentObject private var taskListViewModel: TaskListViewModel
+    
+    var body: some View {
+        HStack {
+            Spacer()
+            Button {
+                taskListViewModel.historyManager.undoManager.undo()
+            } label: {
+                Image(systemName: "arrow.uturn.backward")
+            }
+            .disabled(!(taskListViewModel.historyManager.undoManager.canUndo))
+            Button {
+                taskListViewModel.historyManager.undoManager.redo()
+            } label: {
+                Image(systemName: "arrow.uturn.forward")
+            }
+            .disabled(!(taskListViewModel.historyManager.undoManager.canRedo))
+            .padding(.horizontal)
         }
     }
 }

@@ -24,5 +24,6 @@
 
 // History
 "Added `%@`." = "Added `%@`.";
+"Updated `%@`" = "Updated `%@`";
 "Moved `%@` from %@ to %@." = "Moved `%@` from %@ to %@.";
 "Removed `%@` from %@." = "Removed `%@` from %@.";
