@@ -1,25 +1,27 @@
 # 📌 프로젝트 관리 앱
 프로젝트 기간: 2022.02.28 ~ 2022.03.25
 
-## 🗂 목차
+<br>
 
-- [구현 화면](#구현-화면)
-- [구현 내용](#구현-내용)
-- [Trouble Shooting](#Trouble-Shooting)
-- [고민한 점](#고민한-점)
+## 🗂 목차
+- [📱 구현 화면](#-구현-화면)
+- [📃 구현 내용](#-구현-내용)
+- [🚀 Trouble Shooting](#-Trouble-Shooting)
+- [🤔 고민한 점](#-고민한-점)
 - [⌨️ 키워드](#-키워드)
 
+<br>
 
-## 구현 화면
+## 📱 구현 화면
 |메인 화면|History 화면|
 |:---:|:---:|
 |![image](https://user-images.githubusercontent.com/90945013/161954955-4252703b-6a74-485a-8c89-94f7797bc8c9.png)|![image](https://user-images.githubusercontent.com/90945013/161955606-1f0aac11-4a25-4e55-926b-d1a1daa7ce88.png)|
 |**추가/수정 화면**|**삭제 화면**|
 |![image](https://user-images.githubusercontent.com/90945013/161955333-03d5fa5a-124c-4377-a7be-b1b9a99cc8aa.png)|![image](https://user-images.githubusercontent.com/90945013/161956489-0b7bd6d7-5dba-4301-a73f-a58d49c34183.png)|
 
+<br>
 
-## 구현 내용
-
+## 📃 구현 내용
 ### SwiftUI + MVVM 구현
 - MVVM 패턴으로 설계 하여 구현
 - SwiftUI를 사용하여 뷰를 구현
@@ -50,8 +52,9 @@
 - 의존성 관리도구에 대해 학습하고 SPM을 사용하여 진행
 - 오류처리 및 오류메시지를 관리하여 구현
 
-## Trouble Shooting
+<br>
 
+## 🚀 Trouble Shooting
 ### 1. List에서 row를 공백을 터치하면 동작하지 않는 문제
 
 ### 문제점
@@ -205,7 +208,7 @@ historyManager.registerUndo {
 }
 ```
 
-## 고민한 점
+## 🤔 고민한 점
 
 ### 1. LocalDB 선정   
 
@@ -338,9 +341,9 @@ Detail뷰에 대한 뷰모델을 따로 만들어 관리하는것이 기존의 �
 Service가 ViewModel의 처리방식에 대해 알고, 에러를 보내주지 않는 것은 ViewModel이 에러가 필요해진 시점이 올 때 처리할 작업이 많아지고 위험해진다고 생각했다.
 그래서 먼저 에러를 처리할지 말지를 결정하고 에러를 처리한다면 ViewModel까지 에러를 보내주는 것이 맞다고 생각하였다.
 
+<br>
 
 ## 키워드
-
 - `LocalDB`
     - `Realm`, `SQLite`, `CoreData`
 - `RemoteDB`
